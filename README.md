@@ -150,3 +150,17 @@ public class Result<T> {
 }
 
 ```
+
+
+
+## 二、注册接口
+
+![image-20240601120508231](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601120508231.png)
+
+报406 ，原因 `Result`类 没有加`@Data` 注解
+
+![image-20240601120635911](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601120635911.png)
+
+加上即可
+
+![image-20240601120719728](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601120719728.png)
