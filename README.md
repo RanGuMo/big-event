@@ -155,6 +155,8 @@ public class Result<T> {
 
 ## 二、注册接口
 
+### 1.406 报错原因
+
 ![image-20240601120508231](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601120508231.png)
 
 报406 ，原因 `Result`类 没有加`@Data` 注解
@@ -164,3 +166,54 @@ public class Result<T> {
 加上即可
 
 ![image-20240601120719728](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601120719728.png)
+
+### 2.参数校验
+
+![image-20240601121903443](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601121903443.png)
+
+![image-20240601121916110](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601121916110.png)
+
+使用 Spring Validation
+
+> Spring 提供的一个参数校验框架,使用预定义的注解完成参数校验
+
+![image-20240601121954312](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601121954312.png)
+
+这时候再次 发起注册的请求，且参数`username` 的值只有一位,会报500异常，并不是我们想要的
+
+![image-20240601122302551](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601122302551.png)
+
+### 3. 全局异常处理器，捕获异常
+
+![image-20240601122540155](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601122540155.png)
+
+```java
+package com.itheima.exception;
+
+import com.itheima.pojo.Result;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(Exception.class)
+    public Result handleException(Exception e){
+        e.printStackTrace();
+        return Result.error(StringUtils.hasLength(e.getMessage())? e.getMessage() : "操作失败");
+    }
+}
+```
+
+![image-20240601122635997](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601122635997.png)
+
+> Spring Validation 总结 
+>
+> 导入validation坐标
+>
+> 在参数上添加@Pattern注解,指定校验规则
+>
+> 在Controller类上添加@Validated注解
+>
+> 在全局异常处理器中处理参数校验失败的异常
