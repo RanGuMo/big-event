@@ -676,3 +676,53 @@ public void update(User user) {
 void update(User user);
 ```
 
+### 1.更新用户基本信息接口--参数校验
+
+`User.java` 添加参数校验的注解
+
+> @NotNull  值不能为null
+>
+> @NotEmpty 值不能为null,并且内容不为空
+>
+> @Email 满足邮箱格式
+
+```java
+ 	@NotNull
+    private Integer id;//主键ID    
+
+	@NotEmpty
+    @Pattern(regexp = "^\\S{1,10}$")
+    private String nickname;//昵称
+
+
+    @NotEmpty
+    @Email
+    private String email;//邮箱
+```
+
+改造 `UserController.java` 中的更新用户基本信息接口
+
+```java
+ /**
+     * 更新用户基本信息
+     * @param user
+     * @return
+     */
+    @PutMapping("/update")
+    public Result update(@RequestBody @Validated User user){
+        userService.update(user);
+        return Result.success();
+    }
+```
+
+> 小结
+>
+> 实体类的成员变量上添加注解
+>
+> @NotNull
+>
+> @NotEmpty
+>
+> @Email
+>
+> 接口方法的实体参数上添加@Validated注解
