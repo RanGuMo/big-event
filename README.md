@@ -817,3 +817,130 @@ public void updateAvatar(String avatarUrl) {
     void updatePwd(String md5String, Integer id);
 ```
 
+
+
+## 十、文章分类接口-- 新增文章分类
+
+`Category.java`
+
+```java
+package com.itheima.pojo;
+
+import jakarta.validation.constraints.NotEmpty;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+public class Category {
+    private Integer id;//主键ID
+    @NotEmpty
+    private String categoryName;//分类名称
+    @NotEmpty
+    private String categoryAlias;//分类别名
+    private Integer createUser;//创建人ID
+    private LocalDateTime createTime;//创建时间
+    private LocalDateTime updateTime;//更新时间
+}
+```
+
+`CategoryController.java`
+
+```java
+package com.itheima.controller;
+
+
+import com.itheima.pojo.Category;
+import com.itheima.pojo.Result;
+import com.itheima.service.CategoryService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/category")
+public class CategoryController {
+
+    @Autowired
+    private CategoryService categoryService;
+
+    @PostMapping
+    public Result add(@RequestBody @Validated Category category){
+        categoryService.add(category);
+        return Result.success();
+    }
+}
+
+```
+
+
+
+`CategoryService.java`
+
+```java
+package com.itheima.service;
+
+import com.itheima.pojo.Category;
+
+public interface CategoryService {
+    //新增分类
+    void add(Category category);
+}
+```
+
+`CategoryServiceImpl.java`
+
+```java
+package com.itheima.service.impl;
+
+import com.itheima.mapper.CategoryMapper;
+import com.itheima.pojo.Category;
+import com.itheima.service.CategoryService;
+import com.itheima.utils.ThreadLocalUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+
+
+@Service
+public class CategoryServiceImpl implements CategoryService {
+
+    @Autowired
+    private CategoryMapper categoryMapper;
+    @Override
+    public void add(Category category) {
+        //补充属性值
+        category.setCreateTime(LocalDateTime.now());
+        category.setUpdateTime(LocalDateTime.now());
+
+        Map<String,Object> map = ThreadLocalUtil.get();
+        Integer userId = (Integer) map.get("id");
+        category.setCreateUser(userId);
+        categoryMapper.add(category);
+    }
+}
+```
+
+`CategoryMapper.java`
+
+```java
+package com.itheima.mapper;
+
+import com.itheima.pojo.Category;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface CategoryMapper {
+
+    //新增
+    @Insert("insert into category(category_name,category_alias,create_user,create_time,update_time) " +
+            "values(#{categoryName},#{categoryAlias},#{createUser},#{createTime},#{updateTime})")
+    void add(Category category);
+}
+```
