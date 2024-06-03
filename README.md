@@ -6,7 +6,7 @@
 
 ### 1. 创建springboot3项目
 
-![image-20240601105057707](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601105057707.png)
+![image-20240601105057707](images\image-20240601105057707.png)
 
 ### 2.执行sql
 
@@ -81,7 +81,7 @@ create table article(
 
 ### 4.创建需要的目录，并编写对应的实体类
 
-![image-20240601105555460](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601105555460.png)
+![image-20240601105555460](images\image-20240601105555460.png)
 
 ### 5. 在application.yml 文件中 编写数据连接配置
 
@@ -113,11 +113,11 @@ spring:
 
 在pojo文件下的实体类中添加`@Data` 就行
 
-![image-20240601110512796](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601110512796.png)
+![image-20240601110512796](images\image-20240601110512796.png)
 
 点击编译后，可以看到已经生成了getter setter这些
 
-![image-20240601110704065](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601110704065.png)
+![image-20240601110704065](images\image-20240601110704065.png)
 
 ### 7.编写Result 类，用来统一返回接口数据,放在pojo文件夹中
 
@@ -157,35 +157,35 @@ public class Result<T> {
 
 ### 1.406 报错原因
 
-![image-20240601120508231](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601120508231.png)
+![image-20240601120508231](images\image-20240601120508231.png)
 
 报406 ，原因 `Result`类 没有加`@Data` 注解
 
-![image-20240601120635911](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601120635911.png)
+![image-20240601120635911](images\image-20240601120635911.png)
 
 加上即可
 
-![image-20240601120719728](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601120719728.png)
+![image-20240601120719728](images\image-20240601120719728.png)
 
 ### 2.参数校验
 
-![image-20240601121903443](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601121903443.png)
+![image-20240601121903443](images\image-20240601121903443.png)
 
-![image-20240601121916110](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601121916110.png)
+![image-20240601121916110](images\image-20240601121916110.png)
 
 使用 Spring Validation
 
 > Spring 提供的一个参数校验框架,使用预定义的注解完成参数校验
 
-![image-20240601121954312](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601121954312.png)
+![image-20240601121954312](images\image-20240601121954312.png)
 
 这时候再次 发起注册的请求，且参数`username` 的值只有一位,会报500异常，并不是我们想要的
 
-![image-20240601122302551](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601122302551.png)
+![image-20240601122302551](images\image-20240601122302551.png)
 
 ### 3. 全局异常处理器，捕获异常
 
-![image-20240601122540155](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601122540155.png)
+![image-20240601122540155](images\image-20240601122540155.png)
 
 ```java
 package com.itheima.exception;
@@ -206,7 +206,7 @@ public class GlobalExceptionHandler {
 }
 ```
 
-![image-20240601122635997](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240601122635997.png)
+![image-20240601122635997](images\image-20240601122635997.png)
 
 > Spring Validation 总结 
 >
@@ -245,7 +245,7 @@ public class GlobalExceptionHandler {
 
 ## 四、JWT令牌
 
-![image-20240603091828087](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240603091828087.png)
+![image-20240603091828087](images\image-20240603091828087.png)
 
 > Header(头), 记录令牌类型和签名算法等
 >
@@ -497,7 +497,7 @@ public class WebConfig implements WebMvcConfigurer {
     }
 ```
 
-![image-20240603103604743](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240603103604743.png)
+![image-20240603103604743](images\image-20240603103604743.png)
 
 可以看到密码也响应过来了。创建时间和更新时间也没有值
 
@@ -518,7 +518,7 @@ mybatis:
     map-underscore-to-camel-case: true #开启驼峰命名和下划线命名的自动转换
 ```
 
-![image-20240603104315392](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240603104315392.png)
+![image-20240603104315392](images\image-20240603104315392.png)
 
 ## 六、获取用户详细信息接口---ThreadLocal优化
 
