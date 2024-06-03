@@ -726,3 +726,40 @@ void update(User user);
 > @Email
 >
 > 接口方法的实体参数上添加@Validated注解
+
+
+
+## 八、更新用户头像接口
+
+```java
+ /**
+     * 更新用户头像
+     * @param avatarUrl 参数为URL地址值
+     * @return
+     */
+    @PatchMapping("/updateAvatar")
+    public Result updateAvatar(@RequestParam @URL String avatarUrl) {
+        userService.updateAvatar(avatarUrl);
+        return Result.success();
+    }
+
+// 更新用户头像
+    void updateAvatar(String avatarUrl);
+
+// 更新用户头像
+@Override
+public void updateAvatar(String avatarUrl) {
+    Map<String,Object> map = ThreadLocalUtil.get();
+    Integer id = (Integer) map.get("id");
+    userMapper.updateAvatar(avatarUrl,id);
+}
+
+
+// 更新用户头像
+    @Update("update user set user_pic=#{avatarUrl},update_time=now() where id=#{id}")
+    void updateAvatar(String avatarUrl, Integer id);
+
+```
+
+
+
