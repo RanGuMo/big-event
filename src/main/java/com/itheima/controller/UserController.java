@@ -5,6 +5,7 @@ import com.itheima.pojo.User;
 import com.itheima.service.UserService;
 import com.itheima.utils.JwtUtil;
 import com.itheima.utils.Md5Util;
+import com.itheima.utils.ThreadLocalUtil;
 import jakarta.validation.constraints.Pattern;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
@@ -76,10 +77,13 @@ public class UserController {
      * @return 用户详细信息
      */
     @GetMapping("/userInfo")
-    public Result<User> userInfo(@RequestHeader(name = "Authorization") String token){
-        // 根据用户名查询用户
+    public Result<User> userInfo(/*@RequestHeader(name = "Authorization") String token*/){
+        /*// 根据用户名查询用户
         Map<String, Object> map = JwtUtil.parseToken(token);
-        String username =(String) map.get("username");
+        String username =(String) map.get("username");*/
+
+        Map<String, Object> map = ThreadLocalUtil.get();
+        String username = (String) map.get("username");
 
         User user = userService.findByUserName(username);
         return Result.success(user);
