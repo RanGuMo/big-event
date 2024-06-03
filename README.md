@@ -643,3 +643,36 @@ public class LoginInterceptor implements HandlerInterceptor {
 > 使用ThreadLocal存储的数据, 线程安全
 >
 > 用完记得调用remove方法释放，防止内存泄漏
+
+
+
+## 七、更新用户基本信息接口
+
+```java
+ /**
+     * 更新用户基本信息
+     * @param user
+     * @return
+     */
+    @PutMapping("/update")
+    public Result update(@RequestBody User user){
+        userService.update(user);
+        return Result.success();
+    }
+
+
+
+// 更新用户信息
+void update(User user);
+
+@Override
+public void update(User user) {
+    user.setUpdateTime(LocalDateTime.now()); //设置更新时间为当前时间
+    userMapper.update(user);
+}
+
+// 更新
+@Update("update user set nickname=#{nickname},email=#{email},update_time=#{updateTime} where id=#{id}")
+void update(User user);
+```
+

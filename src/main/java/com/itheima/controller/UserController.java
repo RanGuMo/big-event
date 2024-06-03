@@ -88,4 +88,15 @@ public class UserController {
         User user = userService.findByUserName(username);
         return Result.success(user);
     }
+
+    /**
+     * 更新用户基本信息
+     * @param user
+     * @return
+     */
+    @PutMapping("/update")
+    public Result update(@RequestBody User user){
+        userService.update(user);
+        return Result.success();
+    }
 }
