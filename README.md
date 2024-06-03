@@ -478,3 +478,44 @@ public class WebConfig implements WebMvcConfigurer {
 
 
 
+## 五、获取用户详细信息接口
+
+```java
+ /**
+     * 获取用户详细信息
+     * @param token 请求头Authorization 携带的token
+     * @return 用户详细信息
+     */
+    @GetMapping("/userInfo")
+    public Result<User> userInfo(@RequestHeader(name = "Authorization") String token){
+        // 根据用户名查询用户
+        Map<String, Object> map = JwtUtil.parseToken(token);
+        String username =(String) map.get("username");
+
+        User user = userService.findByUserName(username);
+        return Result.success(user);
+    }
+```
+
+![image-20240603103604743](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240603103604743.png)
+
+可以看到密码也响应过来了。创建时间和更新时间也没有值
+
+`user.java` 中添加如下：
+
+```
+  @JsonIgnore //让springmvc把当前对象转换成json字符串的时候,忽略password,最终的json字符串中就没有password这个属性了
+  private String password;//密码
+```
+
+创建时间和更新时间也没有值，原因：数据库的字段是`create_time`,`update_time`, 而实体类是 `createTime`,`updateTime`
+
+`application.yml` 文件修改如下：
+
+```yaml
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true #开启驼峰命名和下划线命名的自动转换
+```
+
+![image-20240603104315392](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240603104315392.png)
