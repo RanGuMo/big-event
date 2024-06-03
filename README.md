@@ -243,7 +243,23 @@ public class GlobalExceptionHandler {
 
 
 
-## 四、jwt令牌
+## 四、JWT令牌
+
+![image-20240603091828087](C:\Users\Administrator\AppData\Roaming\Typora\typora-user-images\image-20240603091828087.png)
+
+> Header(头), 记录令牌类型和签名算法等
+>
+> PayLoad(载荷),携带自定义的信息
+>
+> Signature(签名),对头部和载荷进行加密计算得来
+
+
+
+### 1. JWT 使用
+
+> 引入java-jwt坐标
+>
+> 调用API生成或验证令牌
 
 pom.xml 导入依赖
 
@@ -311,6 +327,150 @@ public class JwtTest {
         //如果篡改了头部和载荷部分的数据,那么验证失败
         //如果秘钥改了,验证失败
         //token过期
+    }
+}
+
+```
+
+
+
+### 2.改造登录接口，返回JWT令牌
+
+`JwtUtil`工具类
+
+```java
+package com.itheima.utils;
+
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+
+import java.util.Date;
+import java.util.Map;
+
+public class JwtUtil {
+
+    private static final String KEY = "itheima";
+	
+	//接收业务数据,生成token并返回
+    public static String genToken(Map<String, Object> claims) {
+        return JWT.create()
+                .withClaim("claims", claims)
+                .withExpiresAt(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 12))
+                .sign(Algorithm.HMAC256(KEY));
+    }
+
+	//接收token,验证token,并返回业务数据
+    public static Map<String, Object> parseToken(String token) {
+        return JWT.require(Algorithm.HMAC256(KEY))
+                .build()
+                .verify(token)
+                .getClaim("claims")
+                .asMap();
+    }
+
+}
+
+```
+
+`UserController.java`  的`login`接口
+
+```java
+ @PostMapping("/login")
+    public Result<String> login(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^\\S{5,16}$") String password) {
+        //根据用户名查询用户
+        User loginUser = userService.findByUserName(username);
+        //判断该用户是否存在
+        if (loginUser == null) {
+            return Result.error("用户名错误");
+        }
+
+        //判断密码是否正确  loginUser对象中的password是密文
+        if (Md5Util.getMD5String(password).equals(loginUser.getPassword())) {
+            //登录成功
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("id", loginUser.getId());
+            claims.put("username", loginUser.getUsername());
+            String token = JwtUtil.genToken(claims);
+            return Result.success(token);
+            // return Result.success("jwt 令牌。。。");
+        }
+        return Result.error("密码错误");
+    }
+```
+
+
+
+### 3.登录认证
+
+> 使用拦截器统一验证令牌
+>
+> 登录和注册接口需要放行
+
+
+
+登录拦截器  `interceptors/LoginInterceptor.java`
+
+```
+package com.itheima.interceptors;
+
+
+import com.itheima.utils.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+import java.util.Map;
+
+
+@Component
+public class LoginInterceptor implements HandlerInterceptor {
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 令牌验证
+        String token = request.getHeader("Authorization");
+        // 验证token
+        try{
+            Map<String, Object> claims = JwtUtil.parseToken(token);
+            // 放行
+            return true;
+        }catch (Exception e){
+            // http 响应状态码为401
+            response.setStatus(401);
+            // 不放行
+            return false;
+        }
+
+    }
+
+}
+
+```
+
+
+
+在 `WebMvcConfigurer` 中添加拦截器 `config/WebConfig.java`
+
+```java
+package com.itheima.config;
+
+import com.itheima.interceptors.LoginInterceptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class WebConfig implements WebMvcConfigurer {
+    @Autowired
+    private LoginInterceptor loginInterceptor;
+
+    // 添加拦截器
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+       // 登录接口和注册接口不拦截
+       registry.addInterceptor(loginInterceptor).excludePathPatterns("/user/login","/user/register");
     }
 }
 
