@@ -1137,3 +1137,27 @@ public class Category {
 }
 ```
 
+## 十五、根据Id 删除文章分类的接口
+
+```java
+ // 删除文章分类
+    @DeleteMapping
+    public Result delete(Integer id){
+        categoryService.deleteById(id);
+        return Result.success();
+    }
+
+// 删除文章分类
+    void deleteById(Integer id);
+
+ @Override
+    public void deleteById(Integer id) {
+        categoryMapper.deleteById(id);
+    }
+
+// 删除文章分类
+    //根据id删除
+    @Delete("delete from category where id=#{id}")
+    void deleteById(Integer id);
+```
+

@@ -45,4 +45,11 @@ public class CategoryController {
         return Result.success();
     }
 
+    // 删除文章分类
+    @DeleteMapping
+    public Result delete(Integer id){
+        categoryService.deleteById(id);
+        return Result.success();
+    }
+
 }
