@@ -944,3 +944,33 @@ public interface CategoryMapper {
     void add(Category category);
 }
 ```
+
+
+
+
+
+## 十一、文章分类接口-- 查询文章分类列表
+
+```java
+// 文章分类列表
+    @GetMapping
+    public Result<List<Category>> list(){
+        List<Category> cs = categoryService.list();
+        return Result.success(cs);
+    }
+
+// 分类列表
+    List<Category> list();
+
+@Override
+    public List<Category> list() {
+        Map<String,Object> map = ThreadLocalUtil.get();
+        Integer userId = (Integer) map.get("id");
+        return categoryMapper.list(userId);
+    }
+
+  //查询所有
+    @Select("select * from category where create_user = #{userId}")
+    List<Category> list(Integer userId);
+```
+
