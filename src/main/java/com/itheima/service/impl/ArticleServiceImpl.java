@@ -66,4 +66,10 @@ public class ArticleServiceImpl  implements ArticleService {
         article.setUpdateTime(LocalDateTime.now());
         articleMapper.update(article);
     }
+
+    // 根据id 删除文章
+    @Override
+    public void deleteById(Integer id) {
+        articleMapper.deleteById(id);
+    }
 }

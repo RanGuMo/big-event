@@ -1635,3 +1635,30 @@ public void update(Article article) {
         "where id=#{id}")
 void update(Article article);
 ```
+
+
+
+## 二十一、 删除文章接口
+
+```java
+// 删除文章
+@DeleteMapping
+public Result delete(Integer id){
+    articleService.deleteById(id);
+    return Result.success();
+}
+
+// 根据id 删除文章
+void deleteById(Integer id);
+
+// 根据id 删除文章
+@Override
+public void deleteById(Integer id) {
+    articleMapper.deleteById(id);
+}
+
+// 根据id 删除文章
+@Delete("delete from article where id=#{id}")
+void deleteById(Integer id);
+```
+

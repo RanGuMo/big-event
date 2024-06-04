@@ -2,10 +2,7 @@ package com.itheima.mapper;
 
 
 import com.itheima.pojo.Article;
-import org.apache.ibatis.annotations.Insert;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.*;
 
 import java.util.List;
 
@@ -27,4 +24,9 @@ public interface ArticleMapper {
     @Update("update article set title=#{title},content=#{content},cover_img=#{coverImg},state=#{state},category_id=#{categoryId} " +
             "where id=#{id}")
     void update(Article article);
+
+
+    // 根据id 删除文章
+    @Delete("delete from article where id=#{id}")
+    void deleteById(Integer id);
 }

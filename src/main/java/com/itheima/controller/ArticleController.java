@@ -56,6 +56,13 @@ public class ArticleController {
         return Result.success();
     }
 
+    // 删除文章
+    @DeleteMapping
+    public Result delete(Integer id){
+        articleService.deleteById(id);
+        return Result.success();
+    }
+
     @GetMapping("/list")
     public Result<String> list(/*@RequestHeader(name = "Authorization") String token, HttpServletResponse response*/) {
        /* // 验证token
