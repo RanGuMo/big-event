@@ -1383,3 +1383,111 @@ public class StateValidation implements ConstraintValidator<State,String> {
     }
 }
 ```
+
+
+
+## 十七、文章列表（分页查询）接口
+
+`pom.xml` 引入`pagehelper` 坐标
+
+```xml
+<!--pageHelper坐标-->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>1.4.6</version>
+        </dependency>
+```
+
+
+
+`pojo` 添加 `PageBean.java`
+
+```java
+package com.itheima.pojo;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+//分页返回结果对象
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class PageBean <T>{
+    private Long total;//总条数
+    private List<T> items;//当前页数据集合
+}
+
+```
+
+
+
+```java
+ // 文章列表（分页查询）
+    @GetMapping
+    public Result<PageBean<Article>> list(
+            Integer pageNum,
+            Integer pageSize,
+            @RequestParam(required = false) Integer categoryId,
+            @RequestParam(required = false) String state
+    ) {
+        PageBean<Article> pb =  articleService.list(pageNum,pageSize,categoryId,state);
+        return Result.success(pb);
+    }
+
+// 文章列表（分页查询）
+    PageBean<Article> list(Integer pageNum, Integer pageSize, Integer categoryId, String state);
+
+@Override
+    public PageBean<Article> list(Integer pageNum, Integer pageSize, Integer categoryId, String state) {
+        //1.创建PageBean对象
+        PageBean<Article> pb = new PageBean<>();
+
+        //2.开启分页查询 PageHelper
+        PageHelper.startPage(pageNum,pageSize);
+
+        //3.调用mapper
+        Map<String,Object> map = ThreadLocalUtil.get();
+        Integer userId = (Integer) map.get("id");
+        List<Article> as = articleMapper.list(userId,categoryId,state);
+        //Page中提供了方法,可以获取PageHelper分页查询后 得到的总记录条数和当前页数据
+        Page<Article> p = (Page<Article>) as;
+
+        //把数据填充到PageBean对象中
+        pb.setTotal(p.getTotal());
+        pb.setItems(p.getResult());
+        return pb;
+    }
+
+
+mapper
+    // 文章列表（分页查询）
+    List<Article> list(Integer userId, Integer categoryId, String state);
+
+
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.itheima.mapper.ArticleMapper">
+    <!--动态sql-->
+    <select id="list" resultType="com.itheima.pojo.Article">
+        select * from article
+        <where>
+            <if test="categoryId!=null">
+                category_id=#{categoryId}
+            </if>
+
+            <if test="state!=null">
+                and state=#{state}
+            </if>
+
+            and create_user=#{userId}
+        </where>
+    </select>
+</mapper>
+```
+
