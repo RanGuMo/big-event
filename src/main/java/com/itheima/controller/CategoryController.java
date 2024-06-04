@@ -19,7 +19,7 @@ public class CategoryController {
 
     // 文章分类新增
     @PostMapping
-    public Result add(@RequestBody @Validated Category category){
+    public Result add(@RequestBody @Validated(Category.Add.class) Category category){
         categoryService.add(category);
         return Result.success();
     }
@@ -40,7 +40,7 @@ public class CategoryController {
 
     // 更新文章分类
     @PutMapping
-    public Result update(@RequestBody @Validated Category category){
+    public Result update(@RequestBody @Validated(Category.Update.class) Category category){
         categoryService.update(category);
         return Result.success();
     }

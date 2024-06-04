@@ -1040,3 +1040,100 @@ public class Category {
 
 
 
+## 十四、新增和更新文章分类的接口----分组校验
+
+因为实体类的 `id` 不能为空，会导致新增分类的时候必须传`id`，否则新增失败。所以可以通过 **分组校验** 来区分 校验是更新还是新增
+
+> 把校验项进行归类分组，在完成不同的功能的时候，校验指定组中的校验项
+>
+> 1.定义分组
+>
+> 2.定义校验项时指定归属的分组
+>
+> 3.校验时指定要校验的分组
+
+
+
+具体如下：
+
+```java
+package com.itheima.pojo;
+
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+public class Category {
+
+    @NotNull(groups = Update.class)
+    private Integer id;//主键ID
+    @NotEmpty(groups = {Add.class,Update.class})
+    private String categoryName;//分类名称
+    @NotEmpty(groups = {Add.class,Update.class})
+    private String categoryAlias;//分类别名
+    private Integer createUser;//创建人ID
+    private LocalDateTime createTime;//创建时间
+    private LocalDateTime updateTime;//更新时间
+
+
+    public interface Add {
+
+    }
+
+    public interface Update {
+
+    }
+}
+
+```
+
+`CategoryController.java` 修改如下：
+
+```java
+  @PostMapping
+    public Result add(@RequestBody @Validated(Category.Add.class) Category category){
+        categoryService.add(category);
+        return Result.success();
+    }
+
+  @PutMapping
+    public Result update(@RequestBody @Validated(Category.Update.class) Category category){
+        categoryService.update(category);
+        return Result.success();
+    }
+```
+
+校验分组的`Category`实体类还可以写成这样:
+
+```java
+@Data
+public class Category {
+    @NotNull(groups = Update.class)
+    private Integer id;//主键ID
+    @NotEmpty
+    private String categoryName;//分类名称
+    @NotEmpty
+    private String categoryAlias;//分类别名
+    private Integer createUser;//创建人ID
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime createTime;//创建时间
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime updateTime;//更新时间
+
+    //如果说某个校验项没有指定分组,默认属于Default分组
+    //分组之间可以继承, A extends B  那么A中拥有B中所有的校验项
+
+
+    public interface Add extends Default {
+
+    }
+
+    public interface Update extends Default{
+
+    }
+}
+```
+
