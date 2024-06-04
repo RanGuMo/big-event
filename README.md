@@ -1161,3 +1161,225 @@ public class Category {
     void deleteById(Integer id);
 ```
 
+
+
+## 十六、发布文章接口
+
+`ArticleController.java`
+
+```java
+package com.itheima.controller;
+
+
+import com.itheima.pojo.Article;
+import com.itheima.pojo.Result;
+import com.itheima.service.ArticleService;
+import com.itheima.utils.JwtUtil;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+@RequestMapping("/article")
+public class ArticleController {
+    @Autowired
+    private ArticleService articleService;
+
+    @PostMapping
+    public Result add(@RequestBody @Validated Article article) {
+        articleService.add(article);
+        return Result.success();
+    }
+
+  
+
+
+}
+
+```
+
+
+
+`ArticleService.java`
+
+```java
+package com.itheima.service;
+
+import com.itheima.pojo.Article;
+
+public interface ArticleService {
+
+    // 发布文章（新增）
+    void add(Article article);
+}
+```
+
+
+
+`ArticleServiceImpl.java`
+
+```java
+package com.itheima.service.impl;
+
+import com.itheima.mapper.ArticleMapper;
+import com.itheima.pojo.Article;
+import com.itheima.service.ArticleService;
+import com.itheima.utils.ThreadLocalUtil;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.Map;
+@Service
+public class ArticleServiceImpl  implements ArticleService {
+
+    @Autowired
+    private ArticleMapper articleMapper;
+    @Override
+    public void add(Article article) {
+        //补充属性值
+        article.setCreateTime(LocalDateTime.now());
+        article.setUpdateTime(LocalDateTime.now());
+
+        Map<String,Object> map = ThreadLocalUtil.get();
+        Integer userId = (Integer) map.get("id");
+        article.setCreateUser(userId);
+
+        articleMapper.add(article);
+    }
+}
+```
+
+
+
+`ArticleMapper.java`
+
+```java
+package com.itheima.mapper;
+
+
+import com.itheima.pojo.Article;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Mapper;
+
+@Mapper
+public interface ArticleMapper {
+    //新增
+    @Insert("insert into article(title,content,cover_img,state,category_id,create_user,create_time,update_time) " +
+            "values(#{title},#{content},#{coverImg},#{state},#{categoryId},#{createUser},#{createTime},#{updateTime})")
+    void add(Article article);
+}
+```
+
+
+
+`Article.java`, 其中`@State` 为自定义校验规则
+
+```java
+package com.itheima.pojo;
+
+
+import com.itheima.anno.State;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
+import lombok.Data;
+import org.hibernate.validator.constraints.URL;
+
+import java.time.LocalDateTime;
+
+@Data
+public class Article {
+    private Integer id;//主键ID
+    @NotEmpty
+    @Pattern(regexp = "^\\S{1,10}$")
+    private String title;//文章标题
+    @NotEmpty
+    private String content;//文章内容
+    @NotEmpty
+    @URL
+    private String coverImg;//封面图像
+    @State
+    private String state;//发布状态 已发布|草稿
+
+    @NotNull
+    private Integer categoryId;//文章分类id
+    private Integer createUser;//创建人ID
+    private LocalDateTime createTime;//创建时间
+    private LocalDateTime updateTime;//更新时间
+}
+```
+
+
+
+在 `big-event\src\main\java\com\itheima\anno\State.java` 定义注解 `@State`
+
+自定义 @State 如下：
+
+```java
+package com.itheima.anno;
+
+import com.itheima.validation.StateValidation;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+import jakarta.validation.constraints.NotEmpty;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.Repeatable;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import static java.lang.annotation.ElementType.*;
+import static java.lang.annotation.ElementType.TYPE_USE;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
+@Documented//元注解
+@Target({ FIELD})//元注解 FIELD 改注解只能在属性字段中使用
+@Retention(RUNTIME)//元注解 RUNTIME 保留到运行阶段
+@Constraint(validatedBy = { StateValidation.class})//指定提供校验规则的类
+public @interface State {
+    //提供校验失败后的提示信息
+    String message() default "state参数的值只能是已发布或者草稿";
+    //指定分组
+    Class<?>[] groups() default { };
+    //负载  获取到State注解的附加信息
+    Class<? extends Payload>[] payload() default { };
+}
+```
+
+然后在 `big-event\src\main\java\com\itheima\validation\StateValidation.java`
+
+编写校验规则
+
+```java
+package com.itheima.validation;
+
+import com.itheima.anno.State;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
+// ConstraintValidator<State,String> State 表示要校验的类，String表示校验的类型是字符串
+public class StateValidation implements ConstraintValidator<State,String> {
+    /**
+     *
+     * @param value 将来要校验的数据
+     * @param context context in which the constraint is evaluated
+     *
+     * @return 如果返回false,则校验不通过,如果返回true,则校验通过
+     */
+    @Override
+    public boolean isValid(String value, ConstraintValidatorContext context) {
+        //提供校验规则
+        if (value == null){
+            return false;
+        }
+        if (value.equals("已发布") || value.equals("草稿")){
+            return true;
+        }
+        return false;
+    }
+}
+```
