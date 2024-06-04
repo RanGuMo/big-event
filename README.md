@@ -974,3 +974,27 @@ public interface CategoryMapper {
     List<Category> list(Integer userId);
 ```
 
+## 十二、文章分类接口-- 查询文章分类详情
+
+```java
+// 获取文章分类详情
+    @GetMapping("/detail")
+    public Result<Category> detail(Integer id){
+        Category c = categoryService.findById(id);
+        return Result.success(c);
+    }
+
+// 分类详情
+    Category findById(Integer id);
+
+  @Override
+    public Category findById(Integer id) {
+        Category c = categoryMapper.findById(id);
+        return c;
+    }
+
+  //根据id查询
+    @Select("select * from category where id = #{id}")
+    Category findById(Integer id);
+```
+
