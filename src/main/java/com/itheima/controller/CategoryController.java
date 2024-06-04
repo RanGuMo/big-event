@@ -38,4 +38,11 @@ public class CategoryController {
         return Result.success(c);
     }
 
+    // 更新文章分类
+    @PutMapping
+    public Result update(@RequestBody @Validated Category category){
+        categoryService.update(category);
+        return Result.success();
+    }
+
 }

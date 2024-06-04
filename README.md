@@ -998,3 +998,45 @@ public interface CategoryMapper {
     Category findById(Integer id);
 ```
 
+## 十三、文章分类接口-- 更新文章分类
+
+```java
+ // 更新文章分类
+    @PutMapping
+    public Result update(@RequestBody @Validated Category category){
+        categoryService.update(category);
+        return Result.success();
+    }
+
+// 更新文章分类
+    void update(Category category);
+
+ @Override
+    public void update(Category category) {
+        category.setUpdateTime(LocalDateTime.now());
+        categoryMapper.update(category);
+    }
+
+  // 更新文章分类
+    @Update("update category set category_name=#{categoryName},category_alias=#{categoryAlias},update_time=#{updateTime} where id=#{id}")
+    void update(Category category);
+
+
+@Data
+public class Category {
+
+    @NotNull
+    private Integer id;//主键ID
+    @NotEmpty
+    private String categoryName;//分类名称
+    @NotEmpty
+    private String categoryAlias;//分类别名
+    private Integer createUser;//创建人ID
+    private LocalDateTime createTime;//创建时间
+    private LocalDateTime updateTime;//更新时间
+}
+
+```
+
+
+
