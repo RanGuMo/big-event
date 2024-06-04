@@ -18,6 +18,7 @@ public class ArticleServiceImpl  implements ArticleService {
 
     @Autowired
     private ArticleMapper articleMapper;
+    // 新增文章
     @Override
     public void add(Article article) {
         //补充属性值
@@ -31,6 +32,7 @@ public class ArticleServiceImpl  implements ArticleService {
         articleMapper.add(article);
     }
 
+    // 文章列表（分页）
     @Override
     public PageBean<Article> list(Integer pageNum, Integer pageSize, Integer categoryId, String state) {
         //1.创建PageBean对象
@@ -52,8 +54,16 @@ public class ArticleServiceImpl  implements ArticleService {
         return pb;
     }
 
+    // 根据id 获取文章详情
     @Override
     public Article findById(Integer id) {
         return articleMapper.findById(id);
+    }
+
+    // 更新文章
+    @Override
+    public void update(Article article) {
+        article.setUpdateTime(LocalDateTime.now());
+        articleMapper.update(article);
     }
 }

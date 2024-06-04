@@ -20,8 +20,9 @@ public class ArticleController {
     @Autowired
     private ArticleService articleService;
 
+    // 新增文章
     @PostMapping
-    public Result add(@RequestBody @Validated Article article) {
+    public Result add(@RequestBody @Validated(Article.Add.class) Article article) {
         articleService.add(article);
         return Result.success();
     }
@@ -45,6 +46,14 @@ public class ArticleController {
     public Result<Article> detail(Integer id){
         Article article = articleService.findById(id);
         return Result.success(article);
+    }
+
+
+    // 更新文章
+    @PutMapping
+    public Result update(@RequestBody @Validated(Article.Update.class) Article article){
+        articleService.update(article);
+        return Result.success();
     }
 
     @GetMapping("/list")
