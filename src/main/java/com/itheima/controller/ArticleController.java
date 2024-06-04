@@ -2,6 +2,7 @@ package com.itheima.controller;
 
 
 import com.itheima.pojo.Article;
+import com.itheima.pojo.Category;
 import com.itheima.pojo.PageBean;
 import com.itheima.pojo.Result;
 import com.itheima.service.ArticleService;
@@ -36,6 +37,14 @@ public class ArticleController {
     ) {
         PageBean<Article> pb =  articleService.list(pageNum,pageSize,categoryId,state);
         return Result.success(pb);
+    }
+
+
+    // 获取文章详情
+    @GetMapping("/detail")
+    public Result<Article> detail(Integer id){
+        Article article = articleService.findById(id);
+        return Result.success(article);
     }
 
     @GetMapping("/list")

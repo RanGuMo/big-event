@@ -4,6 +4,7 @@ package com.itheima.mapper;
 import com.itheima.pojo.Article;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
@@ -16,4 +17,8 @@ public interface ArticleMapper {
 
     // 文章列表（分页查询）
     List<Article> list(Integer userId, Integer categoryId, String state);
+
+    // 根据Id 获取文章详情
+    @Select("select * from article where id = #{id}")
+    Article findById(Integer id);
 }

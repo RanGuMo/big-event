@@ -1527,3 +1527,26 @@ public class FileUploadController {
 
 ```
 
+## 十九、 根据Id 获取文章详情接口
+
+```java
+   // 获取文章详情
+    @GetMapping("/detail")
+    public Result<Article> detail(Integer id){
+        Article article = articleService.findById(id);
+        return Result.success(article);
+    }
+
+// 通过Id 获取文章详情
+    Article findById(Integer id);
+
+ @Override
+    public Article findById(Integer id) {
+        return articleMapper.findById(id);
+    }
+
+// 根据Id 获取文章详情
+    @Select("select * from article where id = #{id}")
+    Article findById(Integer id);
+```
+
