@@ -1,6 +1,7 @@
 package com.itheima.controller;
 
 import com.itheima.pojo.Result;
+import com.itheima.utils.AliOssUtil;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -19,7 +20,10 @@ public class FileUploadController {
         //保证文件的名字是唯一的,从而防止文件覆盖
         String filename = UUID.randomUUID().toString()+originalFilename.substring(originalFilename.lastIndexOf("."));
         // 本地文件的目录
-        file.transferTo(new File("C:\\Users\\Administrator\\Desktop\\files\\"+filename));
-        return Result.success("图片URL地址。。。");
+        // file.transferTo(new File("C:\\Users\\Administrator\\Desktop\\files\\"+filename));
+        // return Result.success("图片URL地址。。。");
+
+        String url = AliOssUtil.uploadFile(filename,file.getInputStream());
+        return Result.success(url);
     }
 }
