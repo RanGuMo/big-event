@@ -92,6 +92,12 @@
             <version>2.3.3</version>
         </dependency>
 
+        <!--redis坐标-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+        </dependency>
+
 
         <dependency>
             <groupId>org.springframework.boot</groupId>

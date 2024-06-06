@@ -1841,3 +1841,22 @@ public class FileUploadController {
 
 ```
 
+
+
+## 二十三、登录优化--Redis
+
+
+
+> 令牌主动失效机制
+>
+> 登录成功后，给浏览器响应令牌的同时，把该令牌存储到redis中
+>
+> LoginInterceptor拦截器中，需要验证浏览器携带的令牌，并同时需要获取到redis中存储的与之相同的令牌
+>
+> 当用户修改密码成功后，删除redis中存储的旧令牌
+
+如果不这样做，用户更新密码后，旧的token 还是能用。
+
+### 1.SpringBoot集成redis
+
+![image-20240606094320243](images\image-20240606094320243.png)
