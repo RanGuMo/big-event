@@ -1860,3 +1860,158 @@ public class FileUploadController {
 ### 1.SpringBoot集成redis
 
 ![image-20240606094320243](images\image-20240606094320243.png)
+
+
+
+### 2.令牌主动失效
+
+
+
+登录接口 添加 redis
+
+```java
+ @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+
+  /**
+     * 登录
+     * @param username
+     * @param password
+     * @return
+     */
+    @PostMapping("/login")
+    public Result<String> login(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^\\S{5,16}$") String password) {
+        //根据用户名查询用户
+        User loginUser = userService.findByUserName(username);
+        //判断该用户是否存在
+        if (loginUser == null) {
+            return Result.error("用户名错误");
+        }
+
+        //判断密码是否正确  loginUser对象中的password是密文
+        if (Md5Util.getMD5String(password).equals(loginUser.getPassword())) {
+            //登录成功
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("id", loginUser.getId());
+            claims.put("username", loginUser.getUsername());
+            String token = JwtUtil.genToken(claims);
+
+            //把token存储到redis中
+            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+            operations.set(token,token,1, TimeUnit.HOURS);  // 1小时后自动从redis中删除
+            
+            return Result.success(token);
+            // return Result.success("jwt 令牌。。。");
+        }
+        return Result.error("密码错误");
+    }
+
+```
+
+登录拦截器修改
+
+```java
+
+package com.itheima.interceptors;
+
+
+import com.itheima.utils.JwtUtil;
+import com.itheima.utils.ThreadLocalUtil;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+import java.util.Map;
+
+
+@Component
+public class LoginInterceptor implements HandlerInterceptor {
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        // 令牌验证
+        String token = request.getHeader("Authorization");
+        // 验证token
+        try{
+            //从redis中获取相同的token
+            ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+            String redisToken = operations.get(token);
+            if (redisToken==null){
+                //token已经失效了
+                throw new RuntimeException();
+            }
+            
+            Map<String, Object> claims = JwtUtil.parseToken(token);
+            //把业务数据存储到ThreadLocal中
+            ThreadLocalUtil.set(claims);
+            // 放行
+            return true;
+        }catch (Exception e){
+            // http 响应状态码为401
+            response.setStatus(401);
+            // 不放行
+            return false;
+        }
+
+    }
+
+    @Override
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        //清空ThreadLocal中的数据
+        ThreadLocalUtil.remove();
+    }
+
+
+}
+
+```
+
+ 修改密码接口修改
+
+```java
+  /**
+     * 更新用户密码
+     * @param params
+     * @return
+     */
+    @PatchMapping("/updatePwd")
+    public Result updatePwd(@RequestBody Map<String, String> params,@RequestHeader("Authorization") String token) {
+        //1.校验参数
+        String oldPwd = params.get("old_pwd");
+        String newPwd = params.get("new_pwd");
+        String rePwd = params.get("re_pwd");
+
+        if (!StringUtils.hasLength(oldPwd) || !StringUtils.hasLength(newPwd) || !StringUtils.hasLength(rePwd)) {
+            return Result.error("缺少必要的参数");
+        }
+
+        //原密码是否正确
+        //调用userService根据用户名拿到原密码,再和old_pwd比对
+        Map<String,Object> map = ThreadLocalUtil.get();
+        String username = (String) map.get("username");
+        User loginUser = userService.findByUserName(username);
+        if (!loginUser.getPassword().equals(Md5Util.getMD5String(oldPwd))){
+            return Result.error("原密码填写不正确");
+        }
+
+        //newPwd和rePwd是否一样
+        if (!rePwd.equals(newPwd)){
+            return Result.error("两次填写的新密码不一样");
+        }
+
+        //2.调用service完成密码更新
+        userService.updatePwd(newPwd);
+        //删除redis中对应的token
+        ValueOperations<String, String> operations = stringRedisTemplate.opsForValue();
+        operations.getOperations().delete(token);
+        
+        return Result.success();
+    }
+```
+
