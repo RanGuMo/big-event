@@ -2015,3 +2015,46 @@ public class LoginInterceptor implements HandlerInterceptor {
     }
 ```
 
+
+
+## 二十四、SpringBoot项目部署
+
+`pom.xml` 引入依赖,执行`package`
+
+```java
+<build>
+        <plugins>
+            <!--打包插件-->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>3.1.3</version>
+            </plugin>
+        </plugins>
+    </build>
+
+```
+
+会在`target` 目录下生成 `jar` 包
+
+![image-20240606141332027](images\image-20240606141332027.png)
+
+运行jar 包
+
+```bash
+java -jar big-event-0.0.1-SNAPSHOT.jar
+```
+
+
+
+> 1.如何生成jar包？
+>
+> 执行package命令即可
+>
+> 2.如何运行jar包?
+>
+> Java –jar jar包位置
+>
+> 3.Jar包部署对服务器有什么要求？
+>
+> 必须有jre环境
