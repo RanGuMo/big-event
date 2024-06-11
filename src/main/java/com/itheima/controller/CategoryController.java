@@ -4,6 +4,7 @@ package com.itheima.controller;
 import com.itheima.pojo.Category;
 import com.itheima.pojo.Result;
 import com.itheima.service.CategoryService;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -19,7 +20,7 @@ public class CategoryController {
 
     // 文章分类新增
     @PostMapping
-    public Result add(@RequestBody @Validated(Category.Add.class) Category category){
+    public Result<String> add(@RequestBody @Validated(Category.Add.class) Category category){
         categoryService.add(category);
         return Result.success();
     }
@@ -33,21 +34,21 @@ public class CategoryController {
 
     // 获取文章分类详情
     @GetMapping("/detail")
-    public Result<Category> detail(Integer id){
+    public Result<Category> detail(@NotNull final Integer id){
         Category c = categoryService.findById(id);
         return Result.success(c);
     }
 
     // 更新文章分类
     @PutMapping
-    public Result update(@RequestBody @Validated(Category.Update.class) Category category){
+    public Result<String> update(@RequestBody @Validated(Category.Update.class) Category category){
         categoryService.update(category);
         return Result.success();
     }
 
     // 删除文章分类
     @DeleteMapping
-    public Result delete(Integer id){
+    public Result<String> delete(@NotNull final Integer id){
         categoryService.deleteById(id);
         return Result.success();
     }

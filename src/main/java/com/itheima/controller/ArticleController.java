@@ -8,6 +8,7 @@ import com.itheima.pojo.Result;
 import com.itheima.service.ArticleService;
 import com.itheima.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class ArticleController {
 
     // 新增文章
     @PostMapping
-    public Result add(@RequestBody @Validated(Article.Add.class) Article article) {
+    public Result<String> add(@RequestBody @Validated(Article.Add.class) Article article) {
         articleService.add(article);
         return Result.success();
     }
@@ -43,7 +44,7 @@ public class ArticleController {
 
     // 获取文章详情
     @GetMapping("/detail")
-    public Result<Article> detail(Integer id){
+    public Result<Article> detail(@NotNull final Integer id){
         Article article = articleService.findById(id);
         return Result.success(article);
     }
@@ -51,14 +52,14 @@ public class ArticleController {
 
     // 更新文章
     @PutMapping
-    public Result update(@RequestBody @Validated(Article.Update.class) Article article){
+    public Result<String> update(@RequestBody @Validated(Article.Update.class) Article article){
         articleService.update(article);
         return Result.success();
     }
 
     // 删除文章
     @DeleteMapping
-    public Result delete(Integer id){
+    public Result<String> delete(@NotNull final Integer id){
         articleService.deleteById(id);
         return Result.success();
     }

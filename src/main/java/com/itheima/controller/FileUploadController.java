@@ -23,7 +23,8 @@ public class FileUploadController {
         // file.transferTo(new File("C:\\Users\\Administrator\\Desktop\\files\\"+filename));
         // return Result.success("图片URL地址。。。");
 
-        String url = AliOssUtil.uploadFile(filename,file.getInputStream());
-        return Result.success(url);
+        // String url = AliOssUtil.uploadFile(filename,file.getInputStream());
+        // return Result.success(url);
+        return Result.success("https://avatars.githubusercontent.com/u/67958995?v=4");
     }
 }

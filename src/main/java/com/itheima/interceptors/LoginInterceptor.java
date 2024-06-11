@@ -16,13 +16,14 @@ import java.util.Map;
 
 @Component
 public class LoginInterceptor implements HandlerInterceptor {
+    public static final String AUTHORIZATION_HEADER = "Authorization";
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
         // 令牌验证
-        String token = request.getHeader("Authorization");
+        String token = request.getHeader(AUTHORIZATION_HEADER);
         // 验证token
         try{
             //从redis中获取相同的token

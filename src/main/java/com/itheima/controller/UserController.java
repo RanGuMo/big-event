@@ -36,7 +36,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/register")
-    public Result register(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^\\S{5,16}$") String password){
+    public Result<String> register(@Pattern(regexp = "^\\S{5,16}$") String username, @Pattern(regexp = "^\\S{5,16}$") String password){
         //查询用户
         User u = userService.findByUserName(username);
         if (u == null) {
@@ -107,9 +107,16 @@ public class UserController {
      * @return
      */
     @PutMapping("/update")
-    public Result update(@RequestBody @Validated User user){
-        userService.update(user);
-        return Result.success();
+    public Result<String> update(@RequestBody @Validated User user){
+        final Map<String,Object> map = ThreadLocalUtil.get();
+        final  Integer id = (Integer) map.get("id");
+        if(user.getId().equals(id)){
+            userService.update(user);
+            return Result.success();
+        }else {
+            return Result.error("非本人id");
+        }
+
     }
 
     /**
@@ -118,7 +125,7 @@ public class UserController {
      * @return
      */
     @PatchMapping("/updateAvatar")
-    public Result updateAvatar(@RequestParam @URL String avatarUrl) {
+    public Result<String> updateAvatar(@RequestParam @URL String avatarUrl) {
         userService.updateAvatar(avatarUrl);
         return Result.success();
     }
@@ -129,7 +136,7 @@ public class UserController {
      * @return
      */
     @PatchMapping("/updatePwd")
-    public Result updatePwd(@RequestBody Map<String, String> params,@RequestHeader("Authorization") String token) {
+    public Result<String> updatePwd(@RequestBody Map<String, String> params,@RequestHeader("Authorization") String token) {
         //1.校验参数
         String oldPwd = params.get("old_pwd");
         String newPwd = params.get("new_pwd");
