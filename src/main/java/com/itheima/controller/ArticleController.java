@@ -18,8 +18,16 @@ import java.util.Map;
 @RestController
 @RequestMapping("/article")
 public class ArticleController {
+    // @Autowired
+    // private ArticleService articleService;
+
+
+    private final ArticleService articleService;
+
     @Autowired
-    private ArticleService articleService;
+    public ArticleController(ArticleService articleService) {
+        this.articleService = articleService;
+    }
 
     // 新增文章
     @PostMapping
@@ -32,12 +40,12 @@ public class ArticleController {
     // 文章列表（分页查询）
     @GetMapping
     public Result<PageBean<Article>> list(
-            Integer pageNum,
-            Integer pageSize,
-            @RequestParam(required = false) Integer categoryId,
-            @RequestParam(required = false) String state
+            final Integer pageNum,
+            final Integer pageSize,
+            @RequestParam(required = false)final Integer categoryId,
+            @RequestParam(required = false)final String state
     ) {
-        PageBean<Article> pb =  articleService.list(pageNum,pageSize,categoryId,state);
+        final PageBean<Article> pb =  articleService.list(pageNum,pageSize,categoryId,state);
         return Result.success(pb);
     }
 
@@ -45,7 +53,7 @@ public class ArticleController {
     // 获取文章详情
     @GetMapping("/detail")
     public Result<Article> detail(@NotNull final Integer id){
-        Article article = articleService.findById(id);
+        final Article article = articleService.findById(id);
         return Result.success(article);
     }
 

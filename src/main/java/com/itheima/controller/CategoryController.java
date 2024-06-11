@@ -15,8 +15,14 @@ import java.util.List;
 @RequestMapping("/category")
 public class CategoryController {
 
+    // @Autowired
+    // private CategoryService categoryService;
+    private final CategoryService categoryService;
+
     @Autowired
-    private CategoryService categoryService;
+    public CategoryController(CategoryService categoryService) {
+        this.categoryService = categoryService;
+    }
 
     // 文章分类新增
     @PostMapping
@@ -28,14 +34,14 @@ public class CategoryController {
     // 文章分类列表
     @GetMapping
     public Result<List<Category>> list(){
-        List<Category> cs = categoryService.list();
+        final List<Category> cs = categoryService.list();
         return Result.success(cs);
     }
 
     // 获取文章分类详情
     @GetMapping("/detail")
     public Result<Category> detail(@NotNull final Integer id){
-        Category c = categoryService.findById(id);
+        final Category c = categoryService.findById(id);
         return Result.success(c);
     }
 

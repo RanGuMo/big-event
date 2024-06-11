@@ -16,9 +16,9 @@ public class FileUploadController {
     @PostMapping("/upload")
     public Result<String> upload(MultipartFile file) throws Exception {
         //把文件的内容存储到本地磁盘上
-        String originalFilename = file.getOriginalFilename();
+        final String originalFilename = file.getOriginalFilename();
         //保证文件的名字是唯一的,从而防止文件覆盖
-        String filename = UUID.randomUUID().toString()+originalFilename.substring(originalFilename.lastIndexOf("."));
+        final String filename = UUID.randomUUID().toString()+originalFilename.substring(originalFilename.lastIndexOf("."));
         // 本地文件的目录
         // file.transferTo(new File("C:\\Users\\Administrator\\Desktop\\files\\"+filename));
         // return Result.success("图片URL地址。。。");
