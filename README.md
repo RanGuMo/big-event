@@ -1,5 +1,11 @@
 # 大事件后端项目
 
+## 零、项目运行
+
+> SpringBoot 3.1.3 + JDK17 +Mysql + Redis + apache-maven-3.6.3
+
+
+
 ## 一、项目起步
 
 
