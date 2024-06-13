@@ -133,11 +133,17 @@ public class UserController {
      * @param avatarUrl 参数为URL地址值
      * @return
      */
+    // @PatchMapping("/updateAvatar")
+    // public Result<String> updateAvatar(@RequestParam @URL final String avatarUrl) {
+    //     userService.updateAvatar(avatarUrl);
+    //     return Result.success();
+    // }
     @PatchMapping("/updateAvatar")
-    public Result<String> updateAvatar(@RequestParam @URL final String avatarUrl) {
+    public Result<String> updateAvatar(@RequestParam final String avatarUrl) {
         userService.updateAvatar(avatarUrl);
         return Result.success();
     }
+
 
     /**
      * 更新用户密码
